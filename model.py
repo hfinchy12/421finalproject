@@ -5,6 +5,8 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 
+import time
+
 class Model(nn.Module):
 
     def __init__(self, n_features=85, lr=0.00001, n_epochs=100, batch_size=10):
@@ -52,6 +54,7 @@ class Model(nn.Module):
             else:
                 return t[start:start+batch_size]
 
+        start_time = time.time()
         for epoch in range(n_epochs):
             for i in range(0, len(X), batch_size):
                 Xbatch = get_batch(X, i, batch_size)
@@ -71,9 +74,12 @@ class Model(nn.Module):
                 print(f", accuracy {accuracy:.3f}")
             else:
                 with torch.no_grad():
-                    y_pred = self(x_train)
-                accuracy = (y_pred.round() == y_train).float().mean()
+                    y_pred = self(X)
+                accuracy = (y_pred.round() == y).float().mean()
                 print(f", accuracy {accuracy:.3f}")
+        
+        end_time = time.time()
+        print(f"Training completed in {(end_time - start_time):.1f} seconds.")
 
     def predict_proba(self, x, y=None):
         with torch.no_grad():

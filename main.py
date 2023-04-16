@@ -62,7 +62,7 @@ def main():
         submission_x = preprocess_x(load_data(os.path.join(
             args.data_path, 'test_x.csv')), estimateData=True, savePath=save_path_test)
         end_time = time.time()
-        print(f"Processed the data in {end_time - start_time} seconds.")
+        print(f"Processed the data in {(end_time - start_time):.1f} seconds.")
 
 
 
@@ -81,7 +81,7 @@ def main():
     else:
         model.fit(train_x, train_y, test_x, test_y)
 
-    if os.path.exists("submissions"):
+    if not os.path.exists("submissions"):
         os.mkdir("submissions")
 
     now = datetime.datetime.today()
