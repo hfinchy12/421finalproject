@@ -74,7 +74,12 @@ def main():
     n_features = train_x.shape[1]
     print(f"Data has {n_features} features.")
     model = Model(n_features=n_features)
-    model.fit(train_x, train_y, test_x, test_y)
+
+    if args.no_validation_set:
+        print("Training model without a validation set.")
+        model.fit(matched_x, matched_y)
+    else:
+        model.fit(train_x, train_y, test_x, test_y)
 
     if os.path.exists("submissions"):
         os.mkdir("submissions")
