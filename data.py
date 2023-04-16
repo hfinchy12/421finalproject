@@ -118,7 +118,8 @@ def process_patient_stats(df):
     charts = df["nursingchartcelltypevalname"].dropna().unique()
     measurements = np.concatenate((labs, charts))
 
-    feature_types = ["mean", "stdev", "number", "slope", "intercept", "time"]
+    # feature_types = ["mean", "stdev", "number", "slope", "intercept", "time"]
+    feature_types = ["mean", "stdev", "number", "time"]
     features = ["patientunitstayid"]
     for m in measurements:
         for f in feature_types:
@@ -174,14 +175,14 @@ def process_patient_stats(df):
                 row[measurement + " stdev"] = [values.std()]
                 row[measurement + " number"] = [len(values)]
 
-                model = LinearRegression().fit(
-                    line_data["offset"].to_numpy().reshape(-1, 1), line_data["nursingchartvalue"])
+                # model = LinearRegression().fit(
+                #     line_data["offset"].to_numpy().reshape(-1, 1), line_data["nursingchartvalue"])
 
-                slope = model.coef_[0]
-                intercept = model.intercept_
+                # slope = model.coef_[0]
+                # intercept = model.intercept_
 
-                row[measurement + " slope"] = [slope]
-                row[measurement + " intercept"] = [intercept]
+                # row[measurement + " slope"] = [slope]
+                # row[measurement + " intercept"] = [intercept]
                 row[measurement + " time"] = [times.max() - times.min()]
 
         df_row = pd.DataFrame(row).fillna(value=0)
