@@ -13,6 +13,7 @@ from data import load_data, preprocess_x, split_data, match_up_data
 from parser import parse
 from model import Model
 import time
+import datetime
 
 TRAIN_X_FILE = "train_x.csv"
 TRAIN_Y_FILE = "train_y.csv"
@@ -70,12 +71,20 @@ def main():
 
     print(f"Beginning model training.")
     # TODO: pass in arguments from commandline
-    model = Model()
+    n_features = train_x.shape[1]
+    print(f"Data has {n_features} features.")
+    model = Model(n_features=n_features)
     model.fit(train_x, train_y, test_x, test_y)
 
-    model.submit(submission_x, os.path.join(args.data_path, SUBMISSION_FILE))
+    if os.path.exists("submissions"):
+        os.mkdir("submissions")
 
-    model.save()
+    now = datetime.datetime.today()
+    model_time = now.strftime("%m_%d_%H%M")
+
+    submission_path = os.path.join("submissions", "submission_" + model_time + ".csv")
+    model.submit(submission_x, submission_path)
+    model.save(path=os.path.join("submissions", "model_" + model_time + ".pth"))
 
 
 if __name__ == "__main__":
