@@ -21,4 +21,16 @@ def parse():
         "--no_validation_set", action="store_true", help="do not use any training data for validation set"
     )
 
+    parser.add_argument(
+        "--lr", type=float, default=0.00001, help="learning rate for Adam optimizer" 
+    )
+
+    parser.add_argument(
+        "--batch_size", type=int, default=10, help="Training batch size"
+    )
+
+    parser.add_argument(
+        "--n_epochs", type=int, default=100, help="Number of training epochs"
+    )
+
     return parser.parse_args()

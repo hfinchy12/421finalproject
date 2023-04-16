@@ -70,10 +70,17 @@ def main():
     train_x, train_y, test_x, test_y = split_data(matched_x, matched_y)
 
     print(f"Beginning model training.")
-    # TODO: pass in arguments from commandline
     n_features = train_x.shape[1]
     print(f"Data has {n_features} features.")
-    model = Model(n_features=n_features)
+
+    model_args = {
+        "n_features":n_features,
+        "lr":args.lr,
+        "n_epochs":args.n_epochs,
+        "batch_size":args.batch_size
+    }
+
+    model = Model(**model_args)
 
     if args.no_validation_set:
         print("Training model without a validation set.")
