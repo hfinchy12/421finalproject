@@ -7,9 +7,9 @@ import torch.optim as optim
 
 class Model(nn.Module):
 
-    def __init__(self, lr=0.00001, n_epochs=100, batch_size=10):
+    def __init__(self, n_features=85, lr=0.00001, n_epochs=100, batch_size=10):
         super().__init__()
-        self.hidden1 = nn.Linear(85, 128)
+        self.hidden1 = nn.Linear(n_features, 128)
         self.act1 = nn.ReLU()
         self.hidden2 = nn.Linear(128, 50)
         self.act2 = nn.ReLU()
@@ -70,7 +70,10 @@ class Model(nn.Module):
                 accuracy = (y_pred.round() == val_y).float().mean()
                 print(f", accuracy {accuracy:.3f}")
             else:
-                print()
+                with torch.no_grad():
+                    y_pred = self(x_train)
+                accuracy = (y_pred.round() == y_train).float().mean()
+                print(f", accuracy {accuracy:.3f}")
 
     def predict_proba(self, x, y=None):
         with torch.no_grad():
