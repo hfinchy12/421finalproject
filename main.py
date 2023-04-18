@@ -77,7 +77,9 @@ def main():
         "n_features":n_features,
         "lr":args.lr,
         "n_epochs":args.n_epochs,
-        "batch_size":args.batch_size
+        "batch_size":args.batch_size,
+        "dropout_rate":args.dropout_rate,
+        "momentum":args.momentum
     }
 
     model = Model(**model_args)

@@ -33,4 +33,12 @@ def parse():
         "--n_epochs", type=int, default=100, help="Number of training epochs"
     )
 
+    parser.add_argument(
+        "--dropout_rate", type=float, default=0.5, help="dropout rate"
+    )
+
+    parser.add_argument(
+        "--momentum", type=float, default=0.8, help="stochastic gradient descent momentum"
+    )
+
     return parser.parse_args()
