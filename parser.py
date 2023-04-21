@@ -41,4 +41,8 @@ def parse():
         "--momentum", type=float, default=0.8, help="stochastic gradient descent momentum"
     )
 
+    parser.add_argument(
+        "--plot", action="store_true", help="plot average loss and ROC score during training"
+    )
+
     return parser.parse_args()

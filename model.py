@@ -5,11 +5,15 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 
+from sklearn.metrics import roc_auc_score
+
+import matplotlib.pyplot as plt
+
 import time
 
 class Model(nn.Module):
 
-    def __init__(self, n_features=61, lr=0.00001, n_epochs=100, batch_size=10, dropout_rate=0.5, momentum=0.8):
+    def __init__(self, n_features=61, lr=0.00001, n_epochs=100, batch_size=10, dropout_rate=0.5, momentum=0.8, plot_performance=True):
         super().__init__()
         self.hidden1 = nn.Linear(n_features, 256)
         self.act1 = nn.ReLU()
@@ -33,6 +37,8 @@ class Model(nn.Module):
         self.batch_size = batch_size
         self.dropout_rate = dropout_rate
         self.momentum = momentum
+
+        self.plot_performance = plot_performance
     
     def forward(self, x):
         x = self.act1(self.hidden1(x))
@@ -71,33 +77,56 @@ class Model(nn.Module):
             else:
                 return t[start:start+batch_size]
 
+        train_losses = []
+        train_accuracies = []
+
         start_time = time.time()
         for epoch in range(n_epochs):
+            average_loss = 0
+
             for i in range(0, len(X), batch_size):
                 Xbatch = get_batch(X, i, batch_size)
                 y_pred = self.forward(Xbatch)
                 ybatch = get_batch(y, i, batch_size)
-                loss = loss_fn(y_pred, ybatch.reshape((-1, 1)))
+
                 optimizer.zero_grad()
+
+                loss = loss_fn(y_pred, ybatch.reshape((-1, 1)))
+                average_loss += loss / X.shape[0]
+
                 loss.backward()
                 optimizer.step()
             
-            print(f'Epoch {epoch+1}/{n_epochs}: loss {loss:.3f}', end="")
+            print(f'Epoch {epoch+1}/{n_epochs}: loss {average_loss:.3f}', end="")
             accuracy = None
             if have_validation_data:
                 with torch.no_grad():
                     y_pred = self(val_X)
-                accuracy = (y_pred.round() == val_y).float().mean()
+                # accuracy = (y_pred.round() == val_y).float().mean()
+                accuracy = roc_auc_score(val_y, y_pred)
                 print(f", accuracy {accuracy:.3f}\r", end="")
             else:
                 with torch.no_grad():
                     y_pred = self(X)
-                accuracy = (y_pred.round() == y).float().mean()
+                # accuracy = (y_pred.round() == y).float().mean()
+                accuracy = roc_auc_score(y, y_pred)
                 print(f", accuracy {accuracy:.3f}\r", end="")
+            
+            train_losses.append(average_loss.detach().numpy())
+            train_accuracies.append(accuracy)
+            
         
         end_time = time.time()
         print()
         print(f"Training completed in {(end_time - start_time):.1f} seconds.")
+
+        if self.plot_performance:
+            plt.plot(np.arange(1, n_epochs+1), train_losses / max(train_losses), label="loss")
+            plt.plot(np.arange(1, n_epochs+1), train_accuracies, label="ROC score")
+            plt.title("Model performance")
+            plt.xlabel("Epoch")
+            plt.legend()
+            plt.show()
 
     def predict_proba(self, x, y=None):
         with torch.no_grad():
