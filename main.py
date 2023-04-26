@@ -78,8 +78,6 @@ def main():
         "lr":args.lr,
         "n_epochs":args.n_epochs,
         "batch_size":args.batch_size,
-        "dropout_rate":args.dropout_rate,
-        "momentum":args.momentum,
         "plot_performance":args.plot
     }
 

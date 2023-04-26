@@ -15,42 +15,31 @@ class Model(nn.Module):
 
     def __init__(self, n_features=61, lr=0.00001, n_epochs=100, batch_size=10, dropout_rate=0.5, momentum=0.8, plot_performance=True):
         super().__init__()
-        self.hidden1 = nn.Linear(n_features, 256)
+
+        self.hidden1 = nn.Linear(n_features, 128)
         self.act1 = nn.ReLU()
-        self.dropout1 = nn.Dropout(p=dropout_rate)
 
-        self.hidden2 = nn.Linear(256, 128)
+        self.hidden2 = nn.Linear(128, 50)
         self.act2 = nn.ReLU()
-        self.dropout2 = nn.Dropout(p=dropout_rate)
 
-        self.hidden3 = nn.Linear(128, 64)
+        self.hidden3 = nn.Linear(50, 24)
         self.act3 = nn.ReLU()
 
-        self.hidden4 = nn.Linear(64, 32)
-        self.act4 = nn.ReLU()
-
-        self.output = nn.Linear(32, 1)
+        self.output = nn.Linear(24, 1)
         self.act_output = nn.Sigmoid()
 
         self.lr = lr
         self.n_epochs = n_epochs
         self.batch_size = batch_size
-        self.dropout_rate = dropout_rate
-        self.momentum = momentum
 
         self.plot_performance = plot_performance
     
     def forward(self, x):
         x = self.act1(self.hidden1(x))
-        x = self.dropout1(x)
-
         x = self.act2(self.hidden2(x))
-        x = self.dropout2(x)
-
         x = self.act3(self.hidden3(x))
-        x = self.act4(self.hidden4(x))
-
         x = self.act_output(self.output(x))
+
         return x
 
     def fit(self, x_train, y_train, x_val=None, y_val=None):
@@ -64,8 +53,7 @@ class Model(nn.Module):
             have_validation_data = True
 
         loss_fn = nn.BCELoss()
-        # optimizer = optim.Adam(self.parameters(), lr=float(self.lr))
-        optimizer = optim.SGD(self.parameters(), lr=self.lr, momentum=self.momentum)
+        optimizer = optim.Adam(self.parameters(), lr=self.lr)
 
         n_epochs = self.n_epochs
         batch_size = self.batch_size
@@ -92,7 +80,7 @@ class Model(nn.Module):
                 optimizer.zero_grad()
 
                 loss = loss_fn(y_pred, ybatch.reshape((-1, 1)))
-                average_loss += loss / X.shape[0]
+                average_loss += loss / len(X) * batch_size
 
                 loss.backward()
                 optimizer.step()
@@ -104,13 +92,13 @@ class Model(nn.Module):
                     y_pred = self(val_X)
                 # accuracy = (y_pred.round() == val_y).float().mean()
                 accuracy = roc_auc_score(val_y, y_pred)
-                print(f", accuracy {accuracy:.3f}\r", end="")
+                print(f", ROC {accuracy:.3f}\r", end="")
             else:
                 with torch.no_grad():
                     y_pred = self(X)
                 # accuracy = (y_pred.round() == y).float().mean()
                 accuracy = roc_auc_score(y, y_pred)
-                print(f", accuracy {accuracy:.3f}\r", end="")
+                print(f", ROC {accuracy:.3f}\r", end="")
             
             train_losses.append(average_loss.detach().numpy())
             train_accuracies.append(accuracy)
@@ -126,6 +114,7 @@ class Model(nn.Module):
             plt.title("Model performance")
             plt.xlabel("Epoch")
             plt.legend()
+            plt.ylim([0, 1])
             plt.show()
 
     def predict_proba(self, x, y=None):

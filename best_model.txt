@@ -7,3 +7,6 @@
  -p --batch_size 100 --n_epochs 1000 --lr 0.00001 
  // pre dropout, used Adam, network was 61, 128, 50, 24, 1
 
+4/26 3:06 - 0.85
+-p --batch_size 100 --n_epochs 2000 --lr 1e-5 --plot
+// no dropout, used Adam, network was 61, 128, 50, 24, 1
